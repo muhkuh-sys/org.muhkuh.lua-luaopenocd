@@ -1,7 +1,7 @@
 import groovy.json.JsonSlurperClassic
 
 node {
-    def ARTIFACTS_PATH = 'build/repository/org/muhkuh/lua/luaftdi/*'
+    def ARTIFACTS_PATH = 'build/repository/org/muhkuh/lua/luaopenocd/*'
     def strBuilds = env.JENKINS_SELECT_BUILDS
     def atBuilds = new JsonSlurperClassic().parseText(strBuilds)
 
@@ -23,7 +23,7 @@ node {
                         ]
                     ],
                     submoduleCfg: [],
-                    userRemoteConfigs: [[url: 'https://github.com/muhkuh-sys/org.muhkuh.lua-luaftdi.git']]
+                    userRemoteConfigs: [[url: 'https://github.com/muhkuh-sys/org.muhkuh.lua-luaopenocd.git']]
                 ])
 
                 /* Build the project. */
@@ -31,7 +31,7 @@ node {
                 sh "bash .build_examples.sh '${atEntry[0]}' '${atEntry[1]}' '${atEntry[2]}'"
 
                 /* Archive all artifacts. */
-                archiveArtifacts artifacts: "${ARTIFACTS_PATH}/*.tar.xz,${ARTIFACTS_PATH}/*.xml,${ARTIFACTS_PATH}/*.hash,${ARTIFACTS_PATH}/*.pom,${ARTIFACTS_PATH}/*.tar.gz,${ARTIFACTS_PATH}/*.zip"
+                archiveArtifacts artifacts: "${ARTIFACTS_PATH}/*.tar.xz,${ARTIFACTS_PATH}/*.xml,${ARTIFACTS_PATH}/*.hash,${ARTIFACTS_PATH}/*.pom"
 
                 /* Clean up after the build. */
                 sh 'rm -rf .[^.] .??* *'
