@@ -1,0 +1,12 @@
+# Ignore all files in the targets folder.
+/build/
+
+# Ignore the local archives and the local repository.
+/jonchki/local_archives/
+/jonchki/local_repository/
+
+# Ignore all compiled python modules.
+*.pyc
+
+# Ignore all backup files.
+*~
