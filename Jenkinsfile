@@ -28,7 +28,6 @@ node {
 
                 /* Build the project. */
                 sh "bash .build '${atEntry[0]}' '${atEntry[1]}' '${atEntry[2]}'"
-                sh "bash .build_examples.sh '${atEntry[0]}' '${atEntry[1]}' '${atEntry[2]}'"
 
                 /* Archive all artifacts. */
                 archiveArtifacts artifacts: "${ARTIFACTS_PATH}/*.tar.xz,${ARTIFACTS_PATH}/*.xml,${ARTIFACTS_PATH}/*.hash,${ARTIFACTS_PATH}/*.pom"
