@@ -507,6 +507,9 @@ void luaopenocd::openocd_close(void)
 			sharedlib_close(m_tDevice.pvSharedLibraryHandle);
 			m_tDevice.pvSharedLibraryHandle=NULL;
 		}
+
+		/* Go back to the "Initialized" state. */
+		m_tState = STATE_Initialized;
 	}
 }
 
