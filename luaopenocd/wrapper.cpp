@@ -618,25 +618,22 @@ void luaopenocd::get_result(char **ppcBUFFER_OUT, size_t *psizBUFFER_OUT)
 
 void luaopenocd::uninit(void)
 {
-#if 0
-	struct command_context *ptCmdCtx;
-
-
-	if( ptJtagDevice!=NULL )
+	switch(m_tState)
 	{
-		ptCmdCtx = (struct command_context *)(ptJtagDevice->pvOpenocdContext);
-		if( ptCmdCtx!=NULL )
-		{
-			unregister_all_commands(ptCmdCtx, NULL);
+	case STATE_Uninitialized:
+		/* No need to close: uninitialized. */
+		break;
 
-			/* free commandline interface */
-			command_done(ptCmdCtx);
+	case STATE_Initialized:
+		/* No need to close: not open. */
+		break;
 
-			adapter_quit();
+	case STATE_Open:
+		openocd_close();
+		break;
 
-			ptJtagDevice->pvOpenocdContext = NULL;
-		}
+	case STATE_Error:
+		/* No need to close: in error state. (This means the openocd shared object was not found) */
+		break;
 	}
-#endif
 }
-
