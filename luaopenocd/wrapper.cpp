@@ -575,7 +575,11 @@ int luaopenocd::run(char *strLine)
 
 	/* Be pessimistic. */
 	iResult = -1;
-	if( m_tState==STATE_Open )
+	if( strLine==NULL )
+	{
+		fprintf(stderr, "Failed to run a nil command!\n");
+	}
+	else if( m_tState==STATE_Open )
 	{
 		iResult = m_tDevice.tFunctions.tFn.pfnCommandRunLine(m_tDevice.pvOpenocdContext, strLine);
 		if( iResult!=0 )
