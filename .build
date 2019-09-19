@@ -71,8 +71,7 @@ BUILD_DIR=${PRJ_DIR}/build/${JONCHKI_PLATFORM_ID}
 mkdir -p ${BUILD_DIR}
 mkdir -p ${BUILD_DIR}/external
 mkdir -p ${BUILD_DIR}/lua5.1/build_requirements
-mkdir -p ${BUILD_DIR}/lua5.2/build_requirements
-mkdir -p ${BUILD_DIR}/lua5.3/build_requirements
+mkdir -p ${BUILD_DIR}/lua5.4/build_requirements
 
 
 # Install jonchki.
@@ -102,31 +101,16 @@ PATH=${TOOLS_PATH} make pack
 popd
 
 
-# Get the build requirements for the LUA5.2 version.
-pushd ${BUILD_DIR}/lua5.2/build_requirements
-rm -f luaopenocd/lua5.2-luaopenocd-*.xml
-PATH=${TOOLS_PATH} cmake -DBUILDCFG_ONLY_JONCHKI_CFG="ON" -DBUILDCFG_LUA_VERSION="5.2" -DCMAKE_INSTALL_PREFIX="" ${CMAKE_COMPILER} ${CMAKE_PLATFORM} ${PRJ_DIR}
+# Get the build requirements for the LUA5.4 version.
+pushd ${BUILD_DIR}/lua5.4/build_requirements
+rm -f luaopenocd/lua5.4-luaopenocd-*.xml
+PATH=${TOOLS_PATH} cmake -DBUILDCFG_ONLY_JONCHKI_CFG="ON" -DBUILDCFG_LUA_VERSION="5.4" -DCMAKE_INSTALL_PREFIX="" ${CMAKE_COMPILER} ${CMAKE_PLATFORM} ${PRJ_DIR}
 PATH=${TOOLS_PATH} make
-${JONCHKI} install-dependencies --verbose ${JONCHKI_VERBOSE} --syscfg ${PRJ_DIR}/jonchki/jonchkisys.cfg --prjcfg ${PRJ_DIR}/jonchki/jonchkicfg.xml ${JONCHKI_SYSTEM} --build-dependencies luaopenocd/lua5.2-luaopenocd-*.xml
+${JONCHKI} install-dependencies --verbose ${JONCHKI_VERBOSE} --syscfg ${PRJ_DIR}/jonchki/jonchkisys.cfg --prjcfg ${PRJ_DIR}/jonchki/jonchkicfg.xml ${JONCHKI_SYSTEM} --build-dependencies luaopenocd/lua5.4-luaopenocd-*.xml
 popd
 
-# Build the LUA5.2 version.
-pushd ${BUILD_DIR}/lua5.2
-PATH=${TOOLS_PATH} cmake -DBUILDCFG_LUA_USE_SYSTEM="OFF" -DBUILDCFG_LUA_VERSION="5.2" -DCMAKE_INSTALL_PREFIX="" ${CMAKE_COMPILER} ${CMAKE_PLATFORM} ${PRJ_DIR}
-PATH=${TOOLS_PATH} make pack
-popd
-
-
-# Get the build requirements for the LUA5.3 version.
-pushd ${BUILD_DIR}/lua5.3/build_requirements
-rm -f luaopenocd/lua5.3-luaopenocd-*.xml
-PATH=${TOOLS_PATH} cmake -DBUILDCFG_ONLY_JONCHKI_CFG="ON" -DBUILDCFG_LUA_VERSION="5.3" -DCMAKE_INSTALL_PREFIX="" ${CMAKE_COMPILER} ${CMAKE_PLATFORM} ${PRJ_DIR}
-PATH=${TOOLS_PATH} make
-${JONCHKI} install-dependencies --verbose ${JONCHKI_VERBOSE} --syscfg ${PRJ_DIR}/jonchki/jonchkisys.cfg --prjcfg ${PRJ_DIR}/jonchki/jonchkicfg.xml ${JONCHKI_SYSTEM} --build-dependencies luaopenocd/lua5.3-luaopenocd-*.xml
-popd
-
-# Build the LUA5.3 version.
-pushd ${BUILD_DIR}/lua5.3
-PATH=${TOOLS_PATH} cmake -DBUILDCFG_LUA_USE_SYSTEM="OFF" -DBUILDCFG_LUA_VERSION="5.3" -DCMAKE_INSTALL_PREFIX="" ${CMAKE_COMPILER} ${CMAKE_PLATFORM} ${PRJ_DIR}
+# Build the LUA5.4 version.
+pushd ${BUILD_DIR}/lua5.4
+PATH=${TOOLS_PATH} cmake -DBUILDCFG_LUA_USE_SYSTEM="OFF" -DBUILDCFG_LUA_VERSION="5.4" -DCMAKE_INSTALL_PREFIX="" ${CMAKE_COMPILER} ${CMAKE_PLATFORM} ${PRJ_DIR}
 PATH=${TOOLS_PATH} make pack
 popd
