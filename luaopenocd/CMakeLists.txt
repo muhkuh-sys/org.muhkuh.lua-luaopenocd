@@ -1,5 +1,5 @@
 PROJECT("org.muhkuh.lua-luaopenocd")
-SET(PROJECT_VERSION  "1.0.2")
+SET(PROJECT_VERSION  "1.0.3")
 
 FIND_PACKAGE(SWIG REQUIRED)
 
