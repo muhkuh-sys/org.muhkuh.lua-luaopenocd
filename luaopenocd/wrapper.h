@@ -13,6 +13,13 @@ extern "C" {
 
 #ifndef SWIGRUNTIME
 #include <swigluarun.h>
+
+/* swigluarun does not include the lua specific defines. Add them here. */
+typedef struct
+{
+	lua_State* L; /* the state */
+	int ref;      /* a ref in the lua global index */
+} SWIGLUA_REF;
 #endif
 
 
@@ -24,7 +31,7 @@ extern "C" {
 class luaopenocd
 {
 public:
-	luaopenocd(void);
+	luaopenocd(SWIGLUA_REF tLuaFn);
 	~luaopenocd(void);
 
 
@@ -32,6 +39,11 @@ public:
 	int run(char *strLine);
 	void get_result(char **ppcBUFFER_OUT, size_t *psizBUFFER_OUT);
 	void uninit(void);
+
+/* Do not use the rest in Swig. */
+#if !defined(SWIG)
+	static void openocd_output_handler(void *pvUser, const char *pcLine, size_t sizLine);
+	void output_handler(const char *pcLine, size_t sizLine);
 
 
 private:
@@ -49,7 +61,9 @@ private:
 		size_t sizPointerOffset;
 	} OPENOCD_NAME_RESOLVE_T;
 
-	typedef void * (*PFN_MUHKUH_OPENOCD_INIT_T) (const char *pcScriptSearchDir);
+	typedef void (*PFN_MUHKUH_OPENOCD_OUTPUT_HANDLER_T) (void *pvUser, const char *pcLine, size_t sizLine);
+
+	typedef void * (*PFN_MUHKUH_OPENOCD_INIT_T) (const char *pcScriptSearchDir, PFN_MUHKUH_OPENOCD_OUTPUT_HANDLER_T pfnOutputHandler, void *pvOutputHanderData);
 	typedef int (*PFN_MUHKUH_OPENOCD_GET_RESULT_T) (void *pvContext, char *pcBuffer, size_t sizBufferMax);
 	typedef int (*PFN_MUHKUH_OPENOCD_GET_RESULT_ALLOC_T) (void *pvContext, char **ppcBuffer, size_t *psizBuffer);
 	typedef int (*PFN_MUHKUH_OPENOCD_COMMAND_RUN_LINE_T) (void *pvContext, const char *pcLine);
@@ -84,6 +98,7 @@ private:
 
 	STATE_T m_tState;
 	ROMLOADER_JTAG_DEVICE_T m_tDevice;
+	SWIGLUA_REF m_tLuaFn;
 
 	/* This is the path to the folder where the romloader_jtag plugin, the
 	 * openocd shared object and the TCL scripts live.
@@ -100,6 +115,7 @@ private:
 
 	int openocd_open(void);
 	void openocd_close(void);
+#endif
 };
 
 

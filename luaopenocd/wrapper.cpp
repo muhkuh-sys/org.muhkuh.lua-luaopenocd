@@ -21,7 +21,7 @@
 
 
 
-luaopenocd::luaopenocd(void)
+luaopenocd::luaopenocd(SWIGLUA_REF tLuaFn)
  : m_tState(STATE_Uninitialized)
  , m_pcPluginPath(NULL)
  , m_pcOpenocdDataPath(NULL)
@@ -31,6 +31,10 @@ luaopenocd::luaopenocd(void)
 
 	get_plugin_path();
 	get_openocd_path();
+
+	/* Copy the callback function reference. */
+	m_tLuaFn.L = tLuaFn.L;
+	m_tLuaFn.ref = tLuaFn.ref;
 }
 
 
@@ -438,7 +442,7 @@ int luaopenocd::openocd_open(void)
 			if( iResult==0 )
 			{
 				/* Call the init function and pass the data path as a search path for scripts. */
-				pvOpenocdContext = m_tDevice.tFunctions.tFn.pfnInit(m_pcOpenocdDataPath);
+				pvOpenocdContext = m_tDevice.tFunctions.tFn.pfnInit(m_pcOpenocdDataPath, openocd_output_handler, this);
 				if( pvOpenocdContext==NULL )
 				{
 					fprintf(stderr, "Failed to initialize the OpenOCD device context.\n");
@@ -639,5 +643,70 @@ void luaopenocd::uninit(void)
 	case STATE_Error:
 		/* No need to close: in error state. (This means the openocd shared object was not found) */
 		break;
+	}
+}
+
+
+
+void luaopenocd::openocd_output_handler(void *pvUser, const char *pcLine, size_t sizLine)
+{
+	luaopenocd *ptThis;
+
+
+	/* Get the class instance from the user parameter. */
+	ptThis = (luaopenocd*)pvUser;
+
+	/* Call the output handler in the class context. */
+	ptThis->output_handler(pcLine, sizLine);
+}
+
+
+
+void luaopenocd::output_handler(const char *pcLine, size_t sizLine)
+{
+	int iOldTopOfStack;
+	int iResult;
+	const char *pcErrMsg;
+	const char *pcErrDetails;
+	lua_State *L;
+	int ref;
+
+
+	/* Check the LUA state and callback tag. */
+	L = m_tLuaFn.L;
+	ref = m_tLuaFn.ref;
+	if( L!=NULL && ref!=LUA_NOREF && ref!=LUA_REFNIL )
+	{
+		/* Get the current stack position. */
+		iOldTopOfStack = lua_gettop(L);
+
+		/* Get the function reference. */
+		lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+
+		/* Push the arguments on the stack. */
+		lua_pushlstring(L, pcLine, sizLine);
+
+		/* Call the function with 1 argument and 0 return values. */
+		iResult = lua_pcall(L, 1, 0, 0);
+		if( iResult!=0 )
+		{
+			switch( iResult )
+			{
+			case LUA_ERRRUN:
+				pcErrMsg = "runtime error";
+				break;
+			case LUA_ERRMEM:
+				pcErrMsg = "memory allocation error";
+				break;
+			default:
+				pcErrMsg = "unknown errorcode";
+				break;
+			}
+			pcErrDetails = lua_tostring(L, -1);
+			fprintf(stderr, "luaopenocd message handler failed: %s (%d): %s\n", pcErrMsg, iResult, pcErrDetails);
+			fprintf(stderr, "luaopenocd message was: %s\n", pcLine);
+		}
+		/* Return the old stack top. */
+		lua_settop(L, iOldTopOfStack);
 	}
 }

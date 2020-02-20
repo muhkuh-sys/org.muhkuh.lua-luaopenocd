@@ -1,7 +1,8 @@
 %module luaopenocd
 
-%include "stdint.i"
-%include "typemaps.i"
+%include <stdint.i>
+%include <lua_fnptr.i>
+%include <typemaps.i>
 
 %{
 	#include "wrapper.h"
