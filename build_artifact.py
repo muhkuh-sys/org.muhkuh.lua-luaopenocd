@@ -1,7 +1,6 @@
 #! /usr/bin/python3
 
 from jonchki import cli_args
-from jonchki import install
 from jonchki import jonchkihere
 
 import glob
